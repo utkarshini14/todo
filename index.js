@@ -1,0 +1,31 @@
+import express from "express"
+import {MongoClient} from 'mongodb'
+
+const app = express()
+
+app.use(express.json())
+
+const client = await MongoClient.connect("mongodb://127.0.0.1:27017")
+const db = client.db("mydatabase")
+const collection = db.collection("tasks")
+
+app.get("/healthcheck", async function (req, res) {
+    res.status(200).send("Server running");
+});
+
+app.get("/tasks", async (req, res) => {
+    try {
+        const data = await collection.find({}).toArray()
+
+        res.json({status: 200, data: data})
+    } catch (e) {
+        console.log(e)
+        res.json({error: "some error occured"})
+    }
+})
+
+
+app.listen(3000, () => {
+    console.log('server listening on port 3000')
+    console.log("http://localhost:3000/healthcheck");
+})
