@@ -1,5 +1,5 @@
 import express from "express"
-import {MongoClient} from 'mongodb'
+import {MongoClient, ObjectId, Timestamp} from 'mongodb'
 
 const app = express()
 
@@ -24,6 +24,60 @@ app.get("/tasks", async (req, res) => {
     }
 })
 
+app.get("/todo/1", async (req, res) => {
+    try {
+        const data = await collection.findOne({})
+
+        res.json({status: 200, data: data})
+    } catch (e) {
+        console.log(e)
+        res.json({error: "some error occured"})
+    }
+})
+
+app.patch("/todo/:id", async(req,res) => {
+    const data= req.body
+    try {
+         await collection.updateOne(
+            {
+                _id: new ObjectId(req.params.id),
+            },
+            {
+                $set: {},
+            }
+        )
+    } catch (e) {
+        console.log(e)
+        res.json({error: "some error occured"})
+    }
+})
+
+app.post("/todo/new", async (req, res) => {
+    const data = req.body;
+     try {
+           await collection.insertOne({
+           task: data.task,
+           email: data.email,
+           timestamp: new Timestamp(),
+        })
+        res.json({"message": "added"})
+    } catch (e) {
+        console.log(e)
+        res.json({error: "some error occured"})
+    }
+})
+
+app.delete("/todo/:id", async (req,res) => {
+    try {
+        const data = await collection.deleteOne({
+            _id: new ObjectId(req.params.id),
+        })
+        res.json({status: 200, data: data})
+    } catch (e) {
+        console.log(e)
+        res.json({error: "some error occured"})
+    }
+})
 
 app.listen(3000, () => {
     console.log('server listening on port 3000')
