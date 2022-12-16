@@ -43,7 +43,7 @@ app.patch("/todo/:id", async(req,res) => {
                 _id: new ObjectId(req.params.id),
             },
             {
-                $set: {},
+                $set: data,
             }
         )
     } catch (e) {
